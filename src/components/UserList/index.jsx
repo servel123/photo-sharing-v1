@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 import { Link } from "react-router-dom";
 
 import "./styles.css";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData";
 
-/**
- * Define UserList, a React component of Project 4.
- */
 function UserList() {
-  const users = models.userListModel();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    // gọi API backend Codesandbox
+    fetchModel("https://rr39dg-8081.csb.app/api/user/list").then((data) => {
+      if (data) setUsers(data);
+    });
+  }, []);
 
   return (
     <div>
@@ -21,9 +25,7 @@ function UserList() {
                 to={`/users/${item._id}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                <ListItemText
-                  primary={`${item.first_name} ${item.last_name}`}
-                />
+                <ListItemText primary={` ${item.last_name}`} />
               </Link>
             </ListItem>
             <Divider />

@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
+import fetchModel from "../../lib/fetchModelData"; // Thay vì models.js
 
 import "./styles.css";
-import models from "../../modelData/models";
 
 function UserDetail() {
   const { userId } = useParams();
-  const user = models.userModel(userId); // Lấy thông tin người dùng
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (userId) {
+      fetchModel(`https://rr39dg-8081.csb.app/api/user/${userId}`).then(
+        (data) => {
+          if (data) setUser(data);
+        }
+      );
+    }
+  }, [userId]);
+
+  if (!user) return <p>Loading user details...</p>;
 
   return (
     <div>
