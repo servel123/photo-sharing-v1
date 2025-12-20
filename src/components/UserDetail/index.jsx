@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-import fetchModel from "../../lib/fetchModelData"; // Thay vì models.js
+import fetchModel from "../../lib/fetchModelData";
+import { useNavigate } from "react-router-dom";
+// Thay vì models.js
 
 import "./styles.css";
 
 function UserDetail() {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (userId) {
-      fetchModel(`https://rr39dg-8081.csb.app/api/user/${userId}`).then(
-        (data) => {
-          if (data) setUser(data);
-        }
-      );
-    }
-  }, [userId]);
+    if (!userId) return;
 
-  if (!user) return <p>Loading user details...</p>;
+    fetchModel(`https://rr39dg-8081.csb.app/api/user/${userId}`)
+      .then((data) => {
+        setUser(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (err.status === 401) {
+          navigate("/login");
+        }
+      });
+  }, [userId, navigate]);
+
+  if (loading) return <p>Loading user details...</p>;
+  if (!user) return null;
 
   return (
     <div>

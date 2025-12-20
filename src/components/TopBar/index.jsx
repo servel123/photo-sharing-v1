@@ -1,39 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import models from "../../modelData/models";
+import React from "react";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import fetchModel from "../../lib/fetchModelData";
 
-function TopBar() {
-  const location = useLocation();
-  const [rightText, setRightText] = useState("");
-
-  useEffect(() => {
-    const users = models.userListModel();
-    let text = "";
-
-    if (location.pathname === "/users") {
-      text = "User List";
-    } else if (
-      location.pathname.startsWith("/users/") &&
-      !location.pathname.includes("/photos")
-    ) {
-      const userId = location.pathname.split("/")[2];
-      const user = users.find((u) => u._id === userId);
-      if (user) text = `${user.first_name} ${user.last_name}`;
-    } else if (location.pathname.startsWith("/photos/")) {
-      const userId = location.pathname.split("/")[2];
-      const user = users.find((u) => u._id === userId);
-      if (user) text = `Photos of ${user.first_name} ${user.last_name}`;
+function TopBar({ user, setUser }) {
+  // ===== LOGOUT =====
+  const handleLogout = async () => {
+    try {
+      await fetchModel("https://rr39dg-8081.csb.app/api/admin/logout", {
+        method: "POST",
+      });
+    } catch (err) {
+      console.error("Logout error:", err);
     }
 
-    setRightText(text);
-  }, [location]);
+    // Clear user state ở App
+    setUser(null);
+  };
 
   return (
-    <AppBar position="static" color="primary">
+    <AppBar position="static">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6">Huy Lee</Typography>
-        <Typography variant="h6">{rightText}</Typography>
+        {/* LEFT */}
+        <Typography variant="h6">Photo Sharing App</Typography>
+
+        {/* RIGHT */}
+        {!user ? (
+          <Typography variant="body1">Please Login</Typography>
+        ) : (
+          <div>
+            <Typography variant="body1" sx={{ mr: 2, display: "inline" }}>
+              Hi {user.first_name}
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        )}
       </Toolbar>
     </AppBar>
   );

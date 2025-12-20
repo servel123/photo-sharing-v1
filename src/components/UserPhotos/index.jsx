@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Divider } from "@mui/material";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import fetchModel from "../../lib/fetchModelData";
 import "./styles.css";
 
 function UserPhotos() {
   const { userId } = useParams();
+  const navigate = useNavigate();
+
   const [photos, setPhotos] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,25 +18,29 @@ function UserPhotos() {
         const u = await fetchModel(
           `https://rr39dg-8081.csb.app/api/user/${userId}`
         );
+
         const p = await fetchModel(
           `https://rr39dg-8081.csb.app/api/photo/photosOfUser/${userId}`
         );
 
-        setUser(u || null);
-        setPhotos(p || []);
+        setUser(u);
+        setPhotos(p);
       } catch (err) {
-        console.error("Load error:", err);
+        if (err.status === 401) {
+          navigate("/login");
+        } else {
+          console.error("Load error:", err);
+        }
       } finally {
         setLoading(false);
       }
     }
 
     if (userId) loadData();
-  }, [userId]);
+  }, [userId, navigate]);
 
   if (loading) return <p>Loading photos...</p>;
   if (!user) return <p>User not found.</p>;
-
   return (
     <div>
       <Typography variant="h5" gutterBottom>

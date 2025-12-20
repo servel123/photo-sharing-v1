@@ -9,10 +9,16 @@ function UserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // gọi API backend Codesandbox
-    fetchModel("https://rr39dg-8081.csb.app/api/user/list").then((data) => {
-      if (data) setUsers(data);
-    });
+    fetchModel("https://rr39dg-8081.csb.app/api/user/list")
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((err) => {
+        // 👇 CHỈ DÒNG NÀY là mấu chốt Problem 1
+        if (err.status === 401) {
+          setUsers([]); // chưa login → không hiển thị gì
+        }
+      });
   }, []);
 
   return (

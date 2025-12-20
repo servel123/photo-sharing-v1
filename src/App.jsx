@@ -1,36 +1,58 @@
 import "./App.css";
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { Grid, Paper } from "@mui/material";
 
 import TopBar from "./components/TopBar";
+import LoginRegister from "./components/LoginRegister";
 import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 
 function App() {
+  // 🔥 trạng thái user đăng nhập
+  const [user, setUser] = useState(null);
+
   return (
     <Router>
-      <TopBar />
+      {/* ===== TOP BAR ===== */}
+      <TopBar user={user} setUser={setUser} />
 
-      <Grid container spacing={2} style={{ marginTop: "10px" }}>
-        {/* LEFT SIDEBAR */}
-        <Grid item xs={3}>
-          <Paper style={{ height: "100vh", padding: "10px" }}>
-            <UserList />
-          </Paper>
-        </Grid>
+      {/* ===== CHƯA LOGIN ===== */}
+      {!user ? (
+        <LoginRegister setUser={setUser} />
+      ) : (
+        /* ===== ĐÃ LOGIN ===== */
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          {/* LEFT SIDEBAR */}
+          <Grid item xs={3}>
+            <Paper sx={{ height: "100vh", p: 2 }}>
+              <UserList />
+            </Paper>
+          </Grid>
 
-        {/* RIGHT CONTENT */}
-        <Grid item xs={9}>
-          <Paper style={{ minHeight: "100vh", padding: "20px" }}>
-            <Routes>
-              <Route path="/users/:userId" element={<UserDetail />} />
-              <Route path="/photos/:userId" element={<UserPhotos />} />
-            </Routes>
-          </Paper>
+          {/* RIGHT CONTENT */}
+          <Grid item xs={9}>
+            <Paper sx={{ minHeight: "100vh", p: 3 }}>
+              <Routes>
+                <Route path="/users/:userId" element={<UserDetail />} />
+                <Route path="/photos/:userId" element={<UserPhotos />} />
+
+                {/* deep link không hợp lệ */}
+                <Route
+                  path="*"
+                  element={<Navigate to={`/users/${user._id}`} />}
+                />
+              </Routes>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Router>
   );
 }
