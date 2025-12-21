@@ -29,7 +29,7 @@ function TopBar({ user, setUser }) {
         ) : (
           <div>
             <Typography variant="body1" sx={{ mr: 2, display: "inline" }}>
-              Hi {user.first_name}
+              Hi {user.login_name}
             </Typography>
             <Button
               variant="contained"
